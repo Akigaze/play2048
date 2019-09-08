@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <title>2048</title>
+    <link rel="stylesheet" href="main.css" />
+    <script type="text/javascript" src="main.js"></script>
+  </head>
+  <body>
+    <div id="game-grid" class="game-grid">
+      <div id="cell-1-1" class="cell"></div>
+      <div id="cell-1-2" class="cell"></div>
+      <div id="cell-1-3" class="cell"></div>
+
+      <div id="cell-2-1" class="cell"></div>
+      <div id="cell-2-2" class="cell"></div>
+      <div id="cell-2-3" class="cell"></div>
+
+      <div id="cell-3-1" class="cell"></div>
+      <div id="cell-3-2" class="cell"></div>
+      <div id="cell-3-3" class="cell"></div>
+    </div>
+    <div id="banner" class="banner"></div>
+    <div class="reset-icon">
+        <img src="../images/cloud.png" title="back to last step" onclick="EventHandler.reset()"/>
+        <span id="step" class="step-count">0</span>
+    </div>
+  </body>
+</html>
