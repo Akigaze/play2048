@@ -14,7 +14,8 @@ const commonConstants = {
     BACKWORD: -1
   },
   GAME_OVER: "GAME OVER!",
-  WIN: "WIN!"
+  WIN: "WIN!",
+  LOSER: "ಥ_ಥ"
 };
 
 const gameConstants = {
@@ -32,7 +33,7 @@ const gameConstants = {
   },
   nrow: 3,
   ncol: 3,
-  winPoint: 32,
+  winPoint: 512,
   maxHistory: 100,
   styleMapping: {
     0: { bgcolor: "", fontSize: 40 },
@@ -87,8 +88,6 @@ const utils = {
 const state = {
   over: false,
   win: false,
-  lastAction: null,
-  lastResult: null,
   history: [],
   step: 0,
   cellValues: [0, 2, 16, 32, 64, 128, 256, 1024, 2048]
@@ -97,18 +96,14 @@ const state = {
 const dataUtils = {
   addNewValue: (values = state.cellValues) => {
     const newValues = [...values];
-    const index = utils.example(
-      newValues.map((v, i) => (v ? -1 : i)).filter(v => v > -1)
-    );
+    const indexesOf0 = newValues
+      .map((v, i) => (v ? -1 : i))
+      .filter(v => v > -1);
+    const index = utils.example(indexesOf0);
+    console.log("add new value for: ", indexesOf0, " at: ", index);
     if (Number.isNaN(index)) {
       return newValues;
     }
-    console.log(
-      "add new value for: ",
-      newValues.filter(v => v === 0).map((v, i) => i),
-      " at: ",
-      index
-    );
     newValues[index] = 2;
     return newValues;
   },
@@ -171,16 +166,19 @@ const dataUtils = {
         ((i + 1) % gameConstants.ncol !== 0 && v === state.cellValues[i + 1])
     );
     return !canContinue;
-},
-saveHistory: () => {
+  },
+  isWon: () => {
+    return state.cellValues.includes(gameConstants.winPoint);
+  },
+  saveHistory: () => {
     state.history.push([...state.cellValues]);
-    if(state.history.length >= gameConstants.maxHistory){
-        state.history = state.history.slice(gameConstants.maxHistory/2)
+    if (state.history.length >= gameConstants.maxHistory) {
+      state.history = state.history.slice(gameConstants.maxHistory / 2);
     }
-},
-logStep: (value) => {
+  },
+  logStep: value => {
     state.step = state.step + value;
-}
+  }
 };
 
 window.onload = () => {
@@ -196,32 +194,14 @@ const process = {
     state.cellValues = dataUtils.addNewValue(values);
     console.log("cell values are: ", state.cellValues);
   },
-  refreshUI: () => {
-    const cells = ElementGetter.getCells();
-    console.log("refreshUI: ", JSON.stringify(state.cellValues));
-    cells.forEach((cell, i) => {
-      const value = state.cellValues[i];
-      cell.textContent = value || "";
-      cell.style.fontSize = gameConstants.styleMapping[value].fontSize + "px";
-      cell.style.backgroundColor = gameConstants.styleMapping[value].bgcolor;
-    });
-    const stepSpan = ElementGetter.stepSpan()
-    stepSpan.textContent = state.step
+  refreshUI: (refreshGrid = true, reset = false) => {
+    UIRefresher.grid(state.cellValues, refreshGrid);
+    UIRefresher.step(state.step, state.over);
+    UIRefresher.gameOver(state.over, reset);
+    UIRefresher.win(state.win);
   },
   addEventListener: () => {
     document.addEventListener("keydown", EventHandler.keypress);
-  },
-  gameOver: () => {
-    const banner = ElementGetter.banner();
-    banner.textContent = commonConstants.GAME_OVER;
-    banner.style.color = "#f71100";
-    banner.style.display = "flex";
-  },
-  congratulate: () => {
-    const banner = ElementGetter.banner();
-    banner.textContent = commonConstants.WIN;
-    banner.style.color = "#ffeb3b";
-    banner.style.display = "flex";
   }
 };
 
@@ -233,23 +213,24 @@ const EventHandler = {
       if (newValues) {
         console.log("new values are: ", newValues);
         dataUtils.saveHistory();
-        dataUtils.logStep(1)
+        dataUtils.logStep(1);
         state.cellValues = newValues;
       }
       console.log("------------------------------------------");
-      if (state.cellValues.includes(gameConstants.winPoint)) {
-        console.log("you are winner!");
-        state.win = true
-        process.congratulate();
-        document.removeEventListener("keydown", EventHandler.keypress);
+      switch (true) {
+        case dataUtils.isWon(): {
+          console.log("you are winner!");
+          state.win = true;
+          document.removeEventListener("keydown", EventHandler.keypress);
+          break;
+        }
+        case dataUtils.isGameOver(): {
+          state.over = true;
+          console.log("game over!");
+          document.removeEventListener("keydown", EventHandler.keypress);
+        }
       }
-      if (dataUtils.isGameOver()) {
-          state.over = true
-        console.log("game over!");
-        process.gameOver();
-        document.removeEventListener("keydown", EventHandler.keypress);
-      }
-      process.refreshUI();
+      process.refreshUI(!!newValues);
     }
   },
   do: toChange => {
@@ -273,17 +254,52 @@ const EventHandler = {
   reset: () => {
     if (state.history.length > 0) {
       state.cellValues = state.history.pop();
-      if(state.over){
-          state.over = false
-          const banner = ElementGetter.banner();
-          banner.textContent = "";
-          banner.style.color = "";
-          banner.style.display = "";
-          document.addEventListener("keydown", EventHandler.keypress);
+      if (state.over) {
+        state.over = false;
+        document.addEventListener("keydown", EventHandler.keypress);
       }
-      dataUtils.logStep(-1)
-      process.refreshUI();
+      dataUtils.logStep(-1);
+      process.refreshUI(true, true);
     }
+  }
+};
+
+const UIRefresher = {
+  grid: (values, refresh = true) => {
+    if (refresh) {
+      const cells = ElementGetter.getCells();
+      cells.forEach((cell, i) => {
+        const value = values[i];
+        cell.textContent = value || "";
+        cell.style.fontSize = gameConstants.styleMapping[value].fontSize + "px";
+        cell.style.backgroundColor = gameConstants.styleMapping[value].bgcolor;
+      });
+    }
+  },
+  gameOver: (over = false, reset = false) => {
+    const banner = ElementGetter.banner();
+    if (over && !reset) {
+      banner.textContent = commonConstants.GAME_OVER;
+      banner.style.color = "#f71100";
+      banner.style.display = "flex";
+    }
+    if (reset) {
+      banner.textContent = "";
+      banner.style.color = "";
+      banner.style.display = "";
+    }
+  },
+  win: (won = false) => {
+    if (won) {
+      const banner = ElementGetter.banner();
+      banner.textContent = commonConstants.WIN;
+      banner.style.color = "#ffeb3b";
+      banner.style.display = "flex";
+    }
+  },
+  step: (count, over = false) => {
+    const stepSpan = ElementGetter.stepSpan();
+    stepSpan.textContent = over ? commonConstants.LOSER : count;
   }
 };
 
@@ -309,8 +325,8 @@ const ElementGetter = {
   },
   banner: () => {
     return document.getElementById("banner");
-},
-stepSpan: () => {
+  },
+  stepSpan: () => {
     return document.getElementById("step");
-}
+  }
 };
