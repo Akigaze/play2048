@@ -48,30 +48,39 @@ body {
   transition: all 600ms;
 }
 
-.reset-icon {
+.menu-list {
     font-family: fantasy;
     font-size: 16px;
     color: aliceblue;
-    margin: 20px;
-  position: fixed;
-  top: 0;
-  right: 0;
+    margin: 0 20px 0 0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    list-style: none;
+}
+
+.menu-list > li {
+    margin: 20px 0;
+    cursor: pointer;
+}
+
+.menu-list > li img {
+  width: 64px;
+}
+
+.reset-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
 }
 
-.reset-icon > img {
-  width: 64px;
-  cursor: pointer;
-}
-
-.reset-icon > img:hover {
-  width: 72px;
+.menu-list > li:hover {
+  transform: scale(1.2);
   transition: all 500ms;
 }
 
 .step-count {
-    position: absolute;
-    margin-top: 5px;
+  position: absolute;
+  margin-top: 5px;
 }

@@ -21,9 +21,33 @@
       <div id="cell-3-3" class="cell"></div>
     </div>
     <div id="banner" class="banner"></div>
-    <div class="reset-icon">
-        <img src="../images/cloud.png" title="back to last step" onclick="EventHandler.reset()"/>
-        <span id="step" class="step-count">0</span>
-    </div>
+    <ul id="menu" class="menu-list">
+      <li>
+        <div class="reset-icon" onclick="EventHandler.reset()">
+          <img src="../images/cloud.png" title="back to last step" />
+          <span id="step" class="step-count">0</span>
+        </div>
+      </li>
+      <li>
+        <div id="rocket" onclick="EventHandler.delete()">
+          <img src="../images/rocket.png" />
+        </div>
+      </li>
+      <li>
+        <div id="truck" onclick="EventHandler.switch()">
+          <img src="../images/truck.png"/>
+        </div>
+      </li>
+      <li>
+        <div id="cat" onclick="EventHandler.shuffle()">
+          <img src="../images/cat.png"/>
+        </div>
+      </li>
+      <li>
+        <div>
+          <img src="../images/sailboat.png"/>
+        </div>
+      </li>
+    </ul>
   </body>
 </html>

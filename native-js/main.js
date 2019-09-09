@@ -82,7 +82,10 @@ const utils = {
       return sample[Math.floor(Math.random() * sample.length)];
     }
     return NaN;
-  }
+},
+count: (array, condition) => {
+    return array.filter(condition).length
+}
 };
 
 const state = {
@@ -261,7 +264,18 @@ const EventHandler = {
       dataUtils.logStep(-1);
       process.refreshUI(true, true);
     }
-  }
+},
+delete: () => {
+    const {nrow, ncol} = gameConstants
+    const dead = Math.floor(Math.random() * nrow * ncol)
+    if (utils.count(state.cellValues, (value)=> value > 0) > 1){
+        console.log(`delete ${state.cellValues[dead]} at ${dead}`);
+        state.cellValues[dead] = 0
+        process.refreshUI()
+        return
+    }
+    console.log("there is only one, can not delete");
+}
 };
 
 const UIRefresher = {
