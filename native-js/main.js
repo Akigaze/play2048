@@ -15,7 +15,11 @@ const commonConstants = {
   },
   GAME_OVER: "GAME OVER!",
   WIN: "WIN!",
-  LOSER: "ಥ_ಥ"
+  LOSER: "ಥ_ಥ",
+  ANIMATION: {
+    OUT: "setting-out",
+    IN: "setting-in"
+  }
 };
 
 const gameConstants = {
@@ -51,6 +55,22 @@ const gameConstants = {
   }
 };
 
+const GameConfig = {
+    mode: 33,
+    nrow: 3,
+    ncol: 3,
+    winPoint: 512,
+}
+
+const configUtils = {
+    setMode: (mode) => {
+        GameConfig.mode = parseInt(mode);
+        GameConfig.ncol = GameConfig.mode%10
+        GameConfig.nrow = (GameConfig.mode - GameConfig.ncol)/10
+        GameConfig.winPoint = 2**(GameConfig.ncol * GameConfig.nrow)
+    }
+}
+
 const utils = {
   partition: (array, parts = 1) => {
     const sizeOfPart = Math.floor(array.length / parts);
@@ -82,10 +102,10 @@ const utils = {
       return sample[Math.floor(Math.random() * sample.length)];
     }
     return NaN;
-},
-count: (array, condition) => {
-    return array.filter(condition).length
-}
+  },
+  count: (array, condition) => {
+    return array.filter(condition).length;
+  }
 };
 
 const state = {
@@ -264,17 +284,37 @@ const EventHandler = {
       dataUtils.logStep(-1);
       process.refreshUI(true, true);
     }
-},
-delete: () => {
-    const {nrow, ncol} = gameConstants
-    const dead = Math.floor(Math.random() * nrow * ncol)
-    if (utils.count(state.cellValues, (value)=> value > 0) > 1){
-        console.log(`delete ${state.cellValues[dead]} at ${dead}`);
-        state.cellValues[dead] = 0
-        process.refreshUI()
-        return
+  },
+  delete: () => {
+    const { nrow, ncol } = gameConstants;
+    const dead = Math.floor(Math.random() * nrow * ncol);
+    if (utils.count(state.cellValues, value => value > 0) > 1) {
+      console.log(`delete ${state.cellValues[dead]} at ${dead}`);
+      state.cellValues[dead] = 0;
+      process.refreshUI();
+      return;
     }
     console.log("there is only one, can not delete");
+  },
+  openSetting: () => {
+    const settingPannel = ElementGetter.settingPannel();
+    const { OUT, IN } = commonConstants.ANIMATION;
+    if (settingPannel.classList.contains(IN)) {
+      settingPannel.classList.replace(IN, OUT);
+    } else if (settingPannel.classList.contains(OUT)) {
+      settingPannel.classList.replace(OUT, IN);
+    } else {
+        settingPannel.style.display = ""
+      settingPannel.classList.add(OUT);
+    }
+},
+checkMode: () => {
+    const selectedMode = ElementGetter.modeRadios(true)[0].value
+    if (GameConfig.mode !== selectedMode){
+        configUtils.setMode(selectedMode)
+    }
+    console.log(GameConfig);
+
 }
 };
 
@@ -342,5 +382,17 @@ const ElementGetter = {
   },
   stepSpan: () => {
     return document.getElementById("step");
-  }
+  },
+  settingPannel: () => {
+    return document.getElementById("setting-pannel");
+},
+modeRadios: (checked=null) => {
+    let modeList = [...document.getElementsByName("mode")]
+    switch(checked){
+        case null: return modeList;
+        case true: return modeList.filter(e => e.checked);
+        case false: return modeList.filter(e => !e.checked);
+    }
+
+}
 };

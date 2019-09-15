@@ -1,0 +1,9 @@
+@@keyframes longer-to-left {
+    0% {transform: scaleX(0); display: none;}
+    100% {transform: scaleX(1);}
+}
+
+@@keyframes higher-to-bottom {
+    0% {transform: scaleY(0);}
+    100% {transform: scaleY(1);}
+}
