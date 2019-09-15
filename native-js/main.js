@@ -35,9 +35,6 @@ const gameConstants = {
     [commonConstants.eventKey.LEFT]: commonConstants.order.FORWARD,
     [commonConstants.eventKey.RIGHT]: commonConstants.order.BACKWORD
   },
-  nrow: 3,
-  ncol: 3,
-  winPoint: 512,
   maxHistory: 100,
   styleMapping: {
     0: { bgcolor: "", fontSize: 40 },
@@ -56,20 +53,20 @@ const gameConstants = {
 };
 
 const GameConfig = {
-    mode: 33,
-    nrow: 3,
-    ncol: 3,
-    winPoint: 512,
-}
+  mode: 33,
+  nrow: 3,
+  ncol: 3,
+  winPoint: 512
+};
 
 const configUtils = {
-    setMode: (mode) => {
-        GameConfig.mode = parseInt(mode);
-        GameConfig.ncol = GameConfig.mode%10
-        GameConfig.nrow = (GameConfig.mode - GameConfig.ncol)/10
-        GameConfig.winPoint = 2**(GameConfig.ncol * GameConfig.nrow)
-    }
-}
+  setMode: mode => {
+    GameConfig.mode = parseInt(mode);
+    GameConfig.ncol = GameConfig.mode % 10;
+    GameConfig.nrow = (GameConfig.mode - GameConfig.ncol) / 10;
+    GameConfig.winPoint = 2 ** (GameConfig.ncol * GameConfig.nrow);
+  }
+};
 
 const utils = {
   partition: (array, parts = 1) => {
@@ -108,6 +105,40 @@ const utils = {
   }
 };
 
+const Row = function(values) {
+  this.values = [...values];
+  let move = function(values) {
+    if (values.length <= 1) {
+      return values;
+    }
+    let value = values[0];
+    if (value === 0) {
+      return move(values.slice(1));
+    }
+    for (let i = 1; i < values.length; i++) {
+      if (values[i] !== 0 && values[i] !== value) {
+        return [value, ...move(values.slice(i))];
+      }
+      if (values[i] === value) {
+        return [2 * value, ...move(values.slice(i + 1))];
+      }
+    }
+    return values;
+  };
+  this.move = function() {
+    this.values = move(this.values);
+    return this;
+  };
+  this.fixed = function(bit) {
+    if(!bit||bit <= this.values.length){
+        return this
+    }
+    let zeroArray = new Array(bit - this.values.length).fill(0);
+    this.values = this.values.concat(zeroArray);
+    return this;
+  };
+};
+
 const state = {
   over: false,
   win: false,
@@ -132,40 +163,31 @@ const dataUtils = {
   },
   getCellValues: (byRow = true) => {
     if (byRow) {
-      return utils.partition(state.cellValues, gameConstants.nrow);
+      return utils.partition(state.cellValues, GameConfig.nrow);
     }
-    let values = utils.arrayFill(Array(gameConstants.ncol), []);
+    let values = utils.arrayFill(Array(GameConfig.ncol), []);
     state.cellValues.forEach((value, i) => {
-      values[i % gameConstants.ncol].push(value);
+      values[i % GameConfig.ncol].push(value);
     });
     return values;
   },
   valuesByRow: () => {
-    return utils.partition(state.cellValues, gameConstants.nrow);
+    return utils.partition(state.cellValues, GameConfig.nrow);
   },
   valuesByCol: () => {
-    let values = utils.arrayFill(Array(gameConstants.ncol), []);
+    let values = utils.arrayFill(Array(GameConfig.ncol), []);
     state.cellValues.forEach((value, i) => {
-      values[i % gameConstants.ncol].push(value);
+      values[i % GameConfig.ncol].push(value);
     });
     return values;
   },
   updateValue: (values, order = commonConstants.order.FORWARD) => {
     const { FORWARD, BACKWORD } = commonConstants.order;
-    return values.map(row => {
-      let [f, m, l] = order === FORWARD ? row : [...row].reverse();
-      if (m === 0) {
-        (m = l), (l = 0);
-      }
-      if (f === 0) {
-        (f = m), (m = l), (l = 0);
-      }
-      if (f === m) {
-        (f = f + m), (m = l), (l = 0);
-      } else if (m === l) {
-        (m = m + l), (l = 0);
-      }
-      return order === FORWARD ? [f, m, l] : [f, m, l].reverse();
+    return values.map(data => {
+      let row = new Row(order === FORWARD ? data : [...data].reverse())
+        .move()
+        .fixed(data.length);
+      return order === FORWARD ? row.values : row.values.reverse();
     });
   },
   iaValuesEqual: (v1, v2) => {
@@ -185,13 +207,13 @@ const dataUtils = {
     }
     const canContinue = state.cellValues.some(
       (v, i) =>
-        v === state.cellValues[i + gameConstants.ncol] ||
-        ((i + 1) % gameConstants.ncol !== 0 && v === state.cellValues[i + 1])
+        v === state.cellValues[i + GameConfig.ncol] ||
+        ((i + 1) % GameConfig.ncol !== 0 && v === state.cellValues[i + 1])
     );
     return !canContinue;
   },
   isWon: () => {
-    return state.cellValues.includes(gameConstants.winPoint);
+    return state.cellValues.includes(GameConfig.winPoint);
   },
   saveHistory: () => {
     state.history.push([...state.cellValues]);
@@ -212,7 +234,7 @@ window.onload = () => {
 
 const process = {
   initailCellValues: () => {
-    const { ncol, nrow } = gameConstants;
+    const { ncol, nrow } = GameConfig;
     const values = Array(nrow * ncol).fill(0);
     state.cellValues = dataUtils.addNewValue(values);
     console.log("cell values are: ", state.cellValues);
@@ -286,7 +308,7 @@ const EventHandler = {
     }
   },
   delete: () => {
-    const { nrow, ncol } = gameConstants;
+    const { nrow, ncol } = GameConfig;
     const dead = Math.floor(Math.random() * nrow * ncol);
     if (utils.count(state.cellValues, value => value > 0) > 1) {
       console.log(`delete ${state.cellValues[dead]} at ${dead}`);
@@ -299,23 +321,17 @@ const EventHandler = {
   openSetting: () => {
     const settingPannel = ElementGetter.settingPannel();
     const { OUT, IN } = commonConstants.ANIMATION;
-    if (settingPannel.classList.contains(IN)) {
-      settingPannel.classList.replace(IN, OUT);
-    } else if (settingPannel.classList.contains(OUT)) {
-      settingPannel.classList.replace(OUT, IN);
-    } else {
-        settingPannel.style.display = ""
-      settingPannel.classList.add(OUT);
-    }
-},
-checkMode: () => {
-    const selectedMode = ElementGetter.modeRadios(true)[0].value
-    if (GameConfig.mode !== selectedMode){
-        configUtils.setMode(selectedMode)
+    settingPannel.style.display = "";
+    UIRefresher.settingPannel(!settingPannel.classList.contains(OUT));
+  },
+  checkMode: () => {
+    const selectedMode = ElementGetter.modeRadios(true)[0].value;
+    if (GameConfig.mode != selectedMode) {
+      configUtils.setMode(selectedMode);
     }
     console.log(GameConfig);
-
-}
+    // UIRefresher.settingPannel(false);
+  }
 };
 
 const UIRefresher = {
@@ -354,6 +370,17 @@ const UIRefresher = {
   step: (count, over = false) => {
     const stepSpan = ElementGetter.stepSpan();
     stepSpan.textContent = over ? commonConstants.LOSER : count;
+  },
+  settingPannel: (toOpen = true) => {
+    const settingPannel = ElementGetter.settingPannel();
+    const { OUT, IN } = commonConstants.ANIMATION;
+    if (toOpen) {
+      settingPannel.classList.remove(IN);
+      settingPannel.classList.add(OUT);
+    } else {
+      settingPannel.classList.remove(OUT);
+      settingPannel.classList.add(IN);
+    }
   }
 };
 
@@ -363,10 +390,10 @@ const ElementGetter = {
     if (byRow === null) {
       return allCells;
     }
-    const cellsByRow = utils.partition(allCells, gameConstants.nrow);
+    const cellsByRow = utils.partition(allCells, GameConfig.nrow);
     if (!byRow) {
       let cellByCol = [];
-      for (let i = 0; i < gameConstants.ncol; i++) {
+      for (let i = 0; i < GameConfig.ncol; i++) {
         let col = cellsByRow.map(row => row[i]);
         cellByCol.push(col);
       }
@@ -385,14 +412,16 @@ const ElementGetter = {
   },
   settingPannel: () => {
     return document.getElementById("setting-pannel");
-},
-modeRadios: (checked=null) => {
-    let modeList = [...document.getElementsByName("mode")]
-    switch(checked){
-        case null: return modeList;
-        case true: return modeList.filter(e => e.checked);
-        case false: return modeList.filter(e => !e.checked);
+  },
+  modeRadios: (checked = null) => {
+    let modeList = [...document.getElementsByName("mode")];
+    switch (checked) {
+      case null:
+        return modeList;
+      case true:
+        return modeList.filter(e => e.checked);
+      case false:
+        return modeList.filter(e => !e.checked);
     }
-
-}
+  }
 };
