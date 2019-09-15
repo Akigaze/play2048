@@ -49,7 +49,8 @@ const gameConstants = {
     512: { bgcolor: "#1295a1", fontSize: 44 },
     1024: { bgcolor: "#097680", fontSize: 40 },
     2048: { bgcolor: "#035a61", fontSize: 40 }
-  }
+  },
+  cellSize: 110
 };
 
 const GameConfig = {
@@ -130,8 +131,8 @@ const Row = function(values) {
     return this;
   };
   this.fixed = function(bit) {
-    if(!bit||bit <= this.values.length){
-        return this
+    if (!bit || bit <= this.values.length) {
+      return this;
     }
     let zeroArray = new Array(bit - this.values.length).fill(0);
     this.values = this.values.concat(zeroArray);
@@ -139,13 +140,14 @@ const Row = function(values) {
   };
 };
 
-const state = {
+const initialState = {
   over: false,
   win: false,
   history: [],
   step: 0,
-  cellValues: [0, 2, 16, 32, 64, 128, 256, 1024, 2048]
+  cellValues: []
 };
+const state = JSON.parse(JSON.stringify(initialState));
 
 const dataUtils = {
   addNewValue: (values = state.cellValues) => {
@@ -223,6 +225,9 @@ const dataUtils = {
   },
   logStep: value => {
     state.step = state.step + value;
+  },
+  reset: () => {
+    Object.assign(state, JSON.parse(JSON.stringify(initialState)));
   }
 };
 
@@ -318,26 +323,50 @@ const EventHandler = {
     }
     console.log("there is only one, can not delete");
   },
-  openSetting: () => {
+  openSetting: event => {
+    event.stopPropagation();
     const settingPannel = ElementGetter.settingPannel();
     const { OUT, IN } = commonConstants.ANIMATION;
     settingPannel.style.display = "";
-    UIRefresher.settingPannel(!settingPannel.classList.contains(OUT));
+    const isToOpten = !settingPannel.classList.contains(OUT);
+    UIRefresher.settingPannel(isToOpten);
+    const closeSettingPannel = function(event) {
+      if (!settingPannel.contains(event.target)) {
+        UIRefresher.settingPannel(false);
+        document.removeEventListener("click", closeSettingPannel);
+      }
+    };
+    EventHandler.eventSupplement(
+      closeSettingPannel,
+      "click",
+      document,
+      isToOpten
+    );
   },
   checkMode: () => {
     const selectedMode = ElementGetter.modeRadios(true)[0].value;
     if (GameConfig.mode != selectedMode) {
       configUtils.setMode(selectedMode);
+      dataUtils.reset();
+      UIRefresher.layoutChange();
+      process.initailCellValues();
+      process.refreshUI();
     }
-    console.log(GameConfig);
     // UIRefresher.settingPannel(false);
+  },
+  eventSupplement: (handler, type = "click", target = document, add = true) => {
+    if (add) {
+      target.addEventListener(type, handler);
+    } else {
+      target.removeEventListener(type, handler);
+    }
   }
 };
 
 const UIRefresher = {
   grid: (values, refresh = true) => {
     if (refresh) {
-      const cells = ElementGetter.getCells();
+      const cells = ElementGetter.gridCells();
       cells.forEach((cell, i) => {
         const value = values[i];
         cell.textContent = value || "";
@@ -381,11 +410,25 @@ const UIRefresher = {
       settingPannel.classList.remove(OUT);
       settingPannel.classList.add(IN);
     }
+  },
+  layoutChange: () => {
+    const gameGrid = ElementGetter.gameGrid();
+    let cellTemplate = ElementGetter.gridCells()[0].cloneNode();
+    gameGrid.innerHTML = "";
+    for (let i = 0; i < GameConfig.nrow; i++) {
+      for (let j = 0; j < GameConfig.ncol; j++) {
+        let node = cellTemplate.cloneNode();
+        node.id = `cell-${i}-${j}`;
+        gameGrid.appendChild(node);
+      }
+    }
+    gameGrid.style.width = GameConfig.ncol * gameConstants.cellSize + "px";
+    gameGrid.style.height = GameConfig.nrow * gameConstants.cellSize + "px";
   }
 };
 
 const ElementGetter = {
-  getCells: (byRow = null) => {
+  gridCells: (byRow = null) => {
     const allCells = [...document.getElementsByClassName("cell")];
     if (byRow === null) {
       return allCells;
@@ -401,7 +444,7 @@ const ElementGetter = {
     }
     return cellsByRow;
   },
-  getGameGrid: () => {
+  gameGrid: () => {
     return document.getElementById("game-grid");
   },
   banner: () => {
