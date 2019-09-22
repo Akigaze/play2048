@@ -19,6 +19,10 @@ const commonConstants = {
   ANIMATION: {
     OUT: "setting-out",
     IN: "setting-in"
+  },
+  CLASS: {
+    SELECT_MODE: "select-mode",
+    ROCKET_ACTIVE: "rocket-active"
   }
 };
 
@@ -174,6 +178,18 @@ const dataUtils = {
     });
     return values;
   },
+  modifyCellValue: (index, value) => {
+    if (index >= 0 && index < state.cellValues.length) {
+      if (utils.count(state.cellValues, value => value > 0) > 1) {
+        state.cellValues[index] = value;
+      } else {
+        alert("there is only one, can not delete");
+        console.log("there is only one, can not delete");
+      }
+    } else {
+      console.log("invalid element");
+    }
+  },
   valuesByRow: () => {
     return utils.partition(state.cellValues, GameConfig.nrow);
   },
@@ -322,10 +338,12 @@ const EventHandler = {
       process.refreshUI();
       return;
     }
+    alert("there is only one, can not delete");
     console.log("there is only one, can not delete");
   },
   openSetting: event => {
     event.stopPropagation();
+    UIRefresher.explodeMode(false);
     const settingPannel = ElementGetter.settingPannel();
     const { OUT, IN } = commonConstants.ANIMATION;
     settingPannel.style.display = "";
@@ -360,6 +378,56 @@ const EventHandler = {
       target.addEventListener(type, handler);
     } else {
       target.removeEventListener(type, handler);
+    }
+  },
+  seeExplodeMode: event => {
+    event.stopPropagation();
+    UIRefresher.settingPannel(false);
+    const explodeMode = ElementGetter.explodeMode();
+    const { OUT, IN } = commonConstants.ANIMATION;
+    explodeMode.style.display = "";
+    const isToOpten = !explodeMode.classList.contains(OUT);
+    UIRefresher.explodeMode(isToOpten);
+    const closeExplodeMode = function(event) {
+      if (!explodeMode.contains(event.target)) {
+        UIRefresher.explodeMode(false);
+        document.removeEventListener("click", closeExplodeMode);
+      }
+    };
+    EventHandler.eventSupplement(
+      closeExplodeMode,
+      "click",
+      document,
+      isToOpten
+    );
+  },
+  selectToDelete: event => {
+    const { ROCKET_ACTIVE, SELECT_MODE } = commonConstants.CLASS;
+    const rocket = event.target;
+    rocket.classList.add(ROCKET_ACTIVE);
+    console.log("select one guy to delete");
+    let elements = ElementGetter.gridCells().concat(ElementGetter.menuItems());
+    elements.forEach(el => {
+      el.classList.add(SELECT_MODE);
+      el.addEventListener("click", bomb, true);
+    });
+    function bomb(event) {
+      event.stopPropagation();
+      const classList = this.classList;
+      if (classList.contains(SELECT_MODE)) {
+        if (classList.contains("cell")) {
+          const index = ElementGetter.gridCells().indexOf(this);
+          dataUtils.modifyCellValue(index, 0);
+          UIRefresher.grid(state.cellValues);
+        } else {
+          this.style.display = "none";
+        }
+      }
+      rocket.classList.remove(ROCKET_ACTIVE);
+      ElementGetter.selectModes().forEach(el => {
+        el.classList.remove(SELECT_MODE);
+        el.removeEventListener("click", bomb, true);
+      });
     }
   }
 };
@@ -410,6 +478,17 @@ const UIRefresher = {
     } else {
       settingPannel.classList.remove(OUT);
       settingPannel.classList.add(IN);
+    }
+  },
+  explodeMode: (toOpen = true) => {
+    const explodeMode = ElementGetter.explodeMode();
+    const { OUT, IN } = commonConstants.ANIMATION;
+    if (toOpen) {
+      explodeMode.classList.remove(IN);
+      explodeMode.classList.add(OUT);
+    } else {
+      explodeMode.classList.remove(OUT);
+      explodeMode.classList.add(IN);
     }
   },
   layoutChange: () => {
@@ -467,5 +546,18 @@ const ElementGetter = {
       case false:
         return modeList.filter(e => !e.checked);
     }
+  },
+  explodeMode: () => {
+    return document.getElementById("rocket-mode");
+  },
+  menuItems: () => {
+    const menu = document.getElementById("menu");
+    return [...menu.children];
+  },
+  selectModes: () => {
+    const els = document.getElementsByClassName(
+      commonConstants.CLASS.SELECT_MODE
+    );
+    return [...els];
   }
 };

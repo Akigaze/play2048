@@ -25,12 +25,8 @@
       <div id="banner" class="banner"></div>
       <ul id="menu" class="menu-list">
         <li class="hamburger-li">
-          <div
-            id="hamburger"
-            class="hamburger-setting"
-            onclick="EventHandler.openSetting(event)"
-          >
-            <img src="../images/hamburger.png" />
+          <div id="hamburger" class="hamburger-setting" onclick="EventHandler.openSetting(event)">
+            <img src="../images/hamburger.png" title="this is to open setting"/>
           </div>
           <div id="setting-pannel" class="setting" style="display:none">
             <p class="setting-title"><img src="../images/modem.png" /></p>
@@ -59,9 +55,13 @@
             <span id="step" class="step-count">0</span>
           </div>
         </li>
-        <li>
-          <div id="rocket" onclick="EventHandler.delete()">
-            <img src="../images/rocket.png" />
+        <li class="rocket-li">
+          <div id="rocket" onclick="EventHandler.seeExplodeMode(event)">
+            <img src="../images/rocket.png" title="bomb bomb bomb"/>
+          </div>
+          <div id="rocket-mode" class="rocket" style="display:none">
+              <img id="bomb" src="../images/bomb.png" title="random bomb" onclick="EventHandler.delete(event)"/>
+              <img id="rocket-fire" src="../images/rocket-fire.png" title="bomb the guy you hate" onclick="EventHandler.selectToDelete(event)"/>
           </div>
         </li>
         <li>

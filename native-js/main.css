@@ -91,8 +91,8 @@ body {
 }
 
 .setting {
-  width: 200px;
-  height: 280px;
+  width: 160px;
+  height: 200px;
   border: 3px solid #ccc;
   border-radius: 10px;
   position: absolute;
@@ -160,4 +160,45 @@ body {
     background-color: #a5dfe3;
     color: #FFF;
     transition: 300ms;
+}
+
+.rocket-li {
+    position: relative;
+}
+
+.menu-list .rocket {
+    width: 160px;
+    height: 40px;
+    border: 3px solid #ccc;
+    border-radius: 10px;
+    position: absolute;
+    right: 100px;
+    top: 0;
+    margin: 0px -20px;
+    background-color: #fffb;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: default;
+}
+.menu-list .rocket > img {
+    width: 28px;
+    margin: 6px 4px 6px 16px;
+    cursor: pointer;
+    opacity: .6;
+}
+.menu-list .rocket-active,
+.menu-list .rocket > img:hover {
+    transform: scale(1.2) rotate(-45deg)!important;
+    transition: 600ms;
+    opacity: 1!important;
+}
+
+.select-mode {
+    cursor: pointer;
+}
+
+.select-mode:hover {
+    box-sizing: border-box!important;
+    border: 2px dotted red;
+    transition: 100ms;
 }
