@@ -147,6 +147,7 @@ const initialState = {
   step: 0,
   cellValues: []
 };
+
 const state = JSON.parse(JSON.stringify(initialState));
 
 const dataUtils = {
