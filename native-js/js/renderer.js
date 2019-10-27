@@ -6,6 +6,7 @@ const UIRefresher = (function() {
     cell.style.fontSize = gameConstants.styleMapping[value].fontSize + "px";
     cell.style.backgroundColor = gameConstants.styleMapping[value].bgcolor;
   };
+  
   return {
     grid: (values, refresh = true) => {
       if (refresh) {

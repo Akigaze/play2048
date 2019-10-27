@@ -36,13 +36,6 @@ const Row = function(values) {
 
 Object.freeze(Row);
 
-window.onload = () => {
-  process.initailCellValues();
-  process.refreshUI();
-  process.addEventListener();
-  process.ready();
-};
-
 const process = {
   initailCellValues: () => {
     const { ncol, nrow } = config;
