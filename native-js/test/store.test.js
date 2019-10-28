@@ -1,4 +1,5 @@
 describe('Store', function() {
+          const expect = chai.expect
     describe('State', function() {
         const {state} = store
 

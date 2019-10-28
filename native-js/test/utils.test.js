@@ -1,26 +1,101 @@
-const {indexesOf} = utils
+const { indexesOf, count, example, arrayFill } = utils;
 
-describe('Utils', function() {
-    it('test test', function() {
-        let foo = 'abx'
-        expect(foo).to.be.a('string');
-    });
-    describe('indexesOf', function() {
-        it('should return all indexes of given item in the array', function() {
-            const pets = ['tiger', 'dog', 'snake', 'dog']
-            let indexes = indexesOf(pets, 'dog')
+describe("Utils", function() {
+  const expect = chai.expect;
+  const spy = sinon.spy;
 
-            expect(indexes).to.have.lengthOf(2);
-            expect(indexes[0]).to.equal(1);
-            expect(indexes[1]).to.equal(3);
-        });
+  describe("indexesOf", function() {
+    it("should return all indexes of given item in the array", function() {
+      const pets = ["tiger", "dog", "snake", "dog"];
+      let indexes = indexesOf(pets, "dog");
 
-        it('should return empty if given item can\'t be found in array', function() {
-            const pets = ['tiger', 'dog', 'snake', 'dog']
-            let indexes = indexesOf(pets, 'cat')
-
-            expect(indexes).to.be.empty;
-        });
+      expect(indexes).to.have.lengthOf(2);
+      expect(indexes[0]).to.equal(1);
+      expect(indexes[1]).to.equal(3);
     });
 
+    it("should return empty if given item can't be found in array", function() {
+      const pets = ["tiger", "dog", "snake", "dog"];
+      let indexes = indexesOf(pets, "cat");
+
+      expect(indexes).to.be.empty;
+    });
+
+    it("should return empty if no given an array", function() {
+      const pets = "I have tiger, dog, snake, dog";
+      let indexes = indexesOf(pets, "cat");
+
+      expect(indexes).to.be.empty;
+    });
+  });
+
+  describe("count", function() {
+    it("should return the count of items matched the condition within the given array ", function() {
+      const array = [2, 12, 5, 23, 7, 16];
+      const condition = item => item > 10;
+
+      const result = count(array, condition);
+      expect(result).to.equal(3);
+    });
+  });
+
+  describe("example", function() {
+    it("should return any one of the given array at random", function() {
+      const sample = ["dog", "cat", "tiger", "bird", "monkey"];
+      const one = example(sample);
+
+      expect(one).to.be.oneOf(sample);
+    });
+
+    it("should return NaN when not give an array", function() {
+      const sample = "I have tiger, dog, snake, dog";
+      const one = example(sample);
+
+      expect(one).to.be.NaN;
+    });
+
+    it("should return NaN when the given array is empty", function() {
+      const sample = [];
+      const one = example(sample);
+
+      expect(one).to.be.NaN;
+    });
+  });
+
+  describe("arrayFill", function() {
+    it("should fill the given array with specify primitive value", function() {
+      const result = arrayFill(new Array(5), "dog");
+
+      expect(result).to.have.lengthOf(5);
+      expect(new Set(result)).to.have.lengthOf(1);
+      expect(new Set(result)).to.include("dog");
+    });
+
+    it("should fill the given array with specify object", function() {
+      const dog = { name: "wang" };
+      const result = arrayFill(new Array(5), dog);
+
+      expect(result).to.have.lengthOf(5);
+      expect(new Set(result)).to.have.lengthOf(1);
+      expect(new Set(result)).to.include(dog);
+    });
+
+    it("should fill the given array with specify object", function() {
+      const dog = { name: "wang" };
+      const result = arrayFill(new Array(5), dog);
+
+      expect(result).to.have.lengthOf(5);
+      expect(new Set(result)).to.have.lengthOf(1);
+      expect(new Set(result)).to.include(dog);
+    });
+
+    it("should fill the given array with the return value of given function", function() {
+      const fn = spy({ spy: Array }, 'spy');
+      const result = arrayFill(new Array(5), fn);
+
+      expect(result).to.have.lengthOf(5);
+      expect(fn.callCount).to.equal(5);
+      expect(result).to.eql(fn.returnValues);
+    });
+  });
 });

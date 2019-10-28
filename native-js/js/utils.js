@@ -22,7 +22,10 @@ const utils = {
     return array.reduce((pre, cur) => pre.concat(cur), []);
   },
   arrayFill: (array, value) => {
-    return array.fill(null).map(i => JSON.parse(JSON.stringify(value)));
+    if (typeof value === "function") {
+      return array.fill(null).map(() => value());
+    }
+    return array.fill(value);
   },
   example: sample => {
     if (Array.isArray(sample) && sample.length > 0) {

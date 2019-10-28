@@ -50,7 +50,7 @@ const store = new (function Store(){
         if (byRow) {
           return utils.partition(this.state.cellValues, this.config.nrow);
         }
-        let values = utils.arrayFill(Array(this.config.ncol), []);
+        let values = utils.arrayFill(Array(this.config.ncol), Array);
         this.state.cellValues.forEach((value, i) => {
           values[i % this.config.ncol].push(value);
         });
@@ -72,7 +72,7 @@ const store = new (function Store(){
         return utils.partition(this.state.cellValues, this.config.nrow);
       },
       valuesByCol: () => {
-        let values = utils.arrayFill(Array(this.config.ncol), []);
+        let values = utils.arrayFill(Array(this.config.ncol), Array);
         this.state.cellValues.forEach((value, i) => {
           values[i % this.config.ncol].push(value);
         });
