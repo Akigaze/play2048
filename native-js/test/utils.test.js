@@ -1,4 +1,12 @@
-const { indexesOf, count, example, arrayFill } = utils;
+const {
+  indexesOf,
+  count,
+  example,
+  arrayFill,
+  partition,
+  combine,
+  modeConvert
+} = utils;
 
 describe("Utils", function() {
   const expect = chai.expect;
@@ -90,12 +98,64 @@ describe("Utils", function() {
     });
 
     it("should fill the given array with the return value of given function", function() {
-      const fn = spy({ spy: Array }, 'spy');
+      const fn = spy({ spy: Array }, "spy");
       const result = arrayFill(new Array(5), fn);
 
       expect(result).to.have.lengthOf(5);
       expect(fn.callCount).to.equal(5);
       expect(result).to.eql(fn.returnValues);
+    });
+  });
+
+  describe("partition", function() {
+    it("should divide the given array into specify parts", function() {
+      const array = [1, 2, 3, 4, 5, 6, 7, 8];
+      const result = partition(array, 3);
+
+      expect(result).to.have.lengthOf(3);
+      expect(result[0]).to.have.members([1, 2, 3]);
+      expect(result[1]).to.have.members([4, 5, 6]);
+      expect(result[2]).to.have.members([7, 8]);
+    });
+
+    it("should return the original array when miss part", function() {
+      const array = [1, 2, 3, 4, 5, 6, 7, 8];
+      const result = partition(array);
+
+      expect(result).to.have.lengthOf(1);
+      expect(result[0]).to.deep.equal(array);
+    });
+  });
+
+  describe("combine", function() {
+    it("should combine all sub array into one big array by row", function() {
+      const array = [["cat", "dog"], ["apple", "lemon"], ["car"]];
+      const result = combine(array);
+
+      expect(result).to.have.lengthOf(5);
+      expect(result).to.have.members(["cat", "dog", "apple", "lemon", "car"]);
+    });
+
+    it("should combine all sub array into one big array by column", function() {
+      const array = [["cat", "dog"], ["apple", "lemon"], ["car"]];
+      const result = combine(array, false);
+
+      expect(result).to.have.lengthOf(5);
+      expect(result).to.have.members(["cat", "apple", "car", "dog", "lemon"]);
+    });
+  });
+
+  describe("modeConvert", function() {
+    it("should convert to number make up with nrow and ncol", function() {
+      const result = modeConvert({ nrow: 3, ncol: 4 });
+
+      expect(result).to.equal(34);
+    });
+
+    it("should convert to object with nrow and ncol from the given number", function() {
+      const result = modeConvert(45);
+
+      expect(result).to.eql({ nrow: 4, ncol: 5 });
     });
   });
 });

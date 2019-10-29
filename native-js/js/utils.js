@@ -1,6 +1,6 @@
 const utils = {
   partition: (array, parts = 1) => {
-    const sizeOfPart = Math.floor(array.length / parts);
+    const sizeOfPart = Math.ceil(array.length / parts);
     let result = [];
     for (let i = 0; i < parts; i++) {
       let row = array.slice(i * sizeOfPart, (i + 1) * sizeOfPart);
@@ -10,7 +10,7 @@ const utils = {
   },
   combine: (array, byRow = true) => {
     if (!byRow) {
-      const parts = Math.max(...array.map(item => item.length));
+      const parts = Math.max.apply(null, array.map(item => item.length));
       const arrayCopy = [...array];
       array = [];
       for (let i = 0; i < parts; i++) {
@@ -42,5 +42,33 @@ const utils = {
       array.forEach((v, i) => v === value && indexes.push(i));
     }
     return indexes;
+  },
+  modeConvert: param => {
+    const toString = obj => {
+      const _nrow = Number(obj.nrow);
+      const _ncol = Number(obj.ncol);
+      if (!isNaN(_nrow) && !isNaN(_ncol)) {
+        return Number(`${_nrow}${_ncol}`);
+      }
+      return null;
+    };
+    const toObject = value => {
+      const _value = value.toString();
+      const middle = Math.floor(_value.length / 2);
+      return {
+        nrow: Number(_value.slice(0, middle)),
+        ncol: Number(_value.slice(middle))
+      };
+    };
+    if (param) {
+      const _type = typeof param;
+      if (_type === "object") {
+        return toString(param);
+      }
+      if (_type === "number" || _type === "string") {
+        return toObject(param);
+      }
+    }
+    return null;
   }
 };

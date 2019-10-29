@@ -1,4 +1,4 @@
-const { state, action, config, getter } = store;
+const { state, action, config, selector } = store;
 
 const Row = function(values) {
   let move = function(values) {
@@ -53,7 +53,7 @@ const process = {
     document.addEventListener("keydown", EventHandler.keypress);
   },
   ready: () => {
-    const [index, value] = getter.newCell();
+    const [index, value] = selector.newCell();
     if (index > -1) {
       action.updateCellValue(index, value);
       UIRefresher.cell(index, value);

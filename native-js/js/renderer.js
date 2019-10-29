@@ -6,7 +6,7 @@ const UIRefresher = (function() {
     cell.style.fontSize = gameConstants.styleMapping[value].fontSize + "px";
     cell.style.backgroundColor = gameConstants.styleMapping[value].bgcolor;
   };
-  
+
   return {
     grid: (values, refresh = true) => {
       if (refresh) {
@@ -69,10 +69,10 @@ const UIRefresher = (function() {
       let cellTemplate = ElementGetter.gridCells()[0].cloneNode();
       gameGrid.innerHTML = "";
       const ncell = config.nrow * config.ncol;
-      for(let i = 0; i < ncell; i++){
-          let node = cellTemplate.cloneNode();
-          node.id = `cell-${i}`;
-          gameGrid.appendChild(node);
+      for (let i = 0; i < ncell; i++) {
+        let node = cellTemplate.cloneNode();
+        node.id = `cell-${i}`;
+        gameGrid.appendChild(node);
       }
       gameGrid.style.width = config.ncol * gameConstants.cellSize + "px";
       gameGrid.style.height = config.nrow * gameConstants.cellSize + "px";
@@ -157,13 +157,13 @@ const EventHandler = {
       }
       console.log("------------------------------------------");
       switch (true) {
-        case action.isWon(): {
+        case selector.isWon(): {
           console.log("you are winner!");
           state.win = true;
           document.removeEventListener("keydown", EventHandler.keypress);
           break;
         }
-        case action.isGameOver(): {
+        case selector.isGameOver(): {
           state.over = true;
           console.log("game over!");
           document.removeEventListener("keydown", EventHandler.keypress);
@@ -176,18 +176,18 @@ const EventHandler = {
     return key => {
       const byRow = gameConstants.direction[key].isRow;
       const dirOrder = gameConstants.direction[key].order;
-      const values = action.getCellValues(byRow);
+      const values = selector.getCellValues(byRow);
 
       console.log("old arrangement: ", JSON.stringify(values));
 
       let newValues = toChange(values, dirOrder);
 
       console.log("new arrangement: ", JSON.stringify(newValues));
-      if (action.iaValuesEqual(values, newValues)) {
+      if (selector.iaValuesEqual(values, newValues)) {
         return;
       }
       const oneLineValues = utils.combine(newValues, byRow);
-      return action.addNewValue(oneLineValues);
+      return selector.addNewValue(oneLineValues);
     };
   },
   reset: () => {
@@ -236,7 +236,7 @@ const EventHandler = {
   },
   checkMode: () => {
     const selectedMode = ElementGetter.modeRadios(true)[0].value;
-    if (config.mode != selectedMode) {
+    if (utils.modeConvert(config.mode) != selectedMode) {
       action.setMode(selectedMode);
       action.reset();
       UIRefresher.layoutChange();

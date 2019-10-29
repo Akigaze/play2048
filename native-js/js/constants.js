@@ -45,19 +45,6 @@ const gameConstants = {
       order: commonConstants.ORDER.BACKWORD
     }
   },
-  rowDirection: {
-    [commonConstants.EVENT_KEY.UP]: false,
-    [commonConstants.EVENT_KEY.DOWN]: false,
-    [commonConstants.EVENT_KEY.LEFT]: true,
-    [commonConstants.EVENT_KEY.RIGHT]: true
-  },
-  directionOrder: {
-    [commonConstants.EVENT_KEY.UP]: commonConstants.ORDER.FORWARD,
-    [commonConstants.EVENT_KEY.DOWN]: commonConstants.ORDER.BACKWORD,
-    [commonConstants.EVENT_KEY.LEFT]: commonConstants.ORDER.FORWARD,
-    [commonConstants.EVENT_KEY.RIGHT]: commonConstants.ORDER.BACKWORD
-  },
-  maxHistory: 100,
   styleMapping: {
     0: { bgcolor: "", fontSize: 40 },
     2: { bgcolor: "#a5dfe3", fontSize: 64 },
@@ -72,5 +59,11 @@ const gameConstants = {
     1024: { bgcolor: "#097680", fontSize: 40 },
     2048: { bgcolor: "#035a61", fontSize: 40 }
   },
+  mode: Object.freeze({
+    33: { nrow: 3, ncol: 3 },
+    44: { nrow: 4, ncol: 4 },
+    55: { nrow: 5, ncol: 5 }
+  }),
+  maxHistory: 100,
   cellSize: 110
 };
