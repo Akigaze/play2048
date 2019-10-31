@@ -79,12 +79,20 @@ const store = new function Store() {
       }
       nextValues[index] = 2;
       return nextValues;
+    },
+    movedCellValues: (values, order = commonConstants.ORDER.FORWARD) => {
+      return values.map(data =>
+        new Row(data, order)
+          .move()
+          .fixed(data.length)
+          .valueOf()
+      );
     }
   };
   this.action = {
     setCellValues: values => (this.state.cellValues = values),
     updateCellValue: (index, value) => (this.state.cellValues[index] = value),
-    modifyCellValue: (index, value) => {
+    resetCellValue: (index, value) => {
       if (index >= 0 && index < this.state.cellValues.length) {
         if (utils.count(this.state.cellValues, value => value > 0) > 1) {
           this.state.cellValues[index] = value;
@@ -95,16 +103,6 @@ const store = new function Store() {
       } else {
         console.log("invalid element");
       }
-    },
-
-    updateValue: (values, order = commonConstants.ORDER.FORWARD) => {
-      const { FORWARD, BACKWORD } = commonConstants.ORDER;
-      return values.map(data => {
-        let row = new Row(order === FORWARD ? data : [...data].reverse())
-          .move()
-          .fixed(data.length);
-        return order === FORWARD ? row.values : row.values.reverse();
-      });
     },
     saveHistory: () => {
       this.state.history.push([...this.state.cellValues]);

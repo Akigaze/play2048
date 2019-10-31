@@ -1,6 +1,7 @@
 const { state, action, config, selector } = store;
 
-const Row = function(values) {
+const Row = function(values, order) {
+  const { FORWARD, BACKWORD } = commonConstants.ORDER;
   let move = function(values) {
     if (values.length <= 1) {
       return values;
@@ -19,7 +20,8 @@ const Row = function(values) {
     }
     return values;
   };
-  this.values = values;
+  this.order = order;
+  this.values = order === FORWARD ? values : [...values].reverse();
   this.move = function() {
     this.values = move(this.values);
     return this;
@@ -31,6 +33,9 @@ const Row = function(values) {
     let zeroArray = new Array(length - this.values.length).fill(0);
     this.values = this.values.concat(zeroArray);
     return this;
+  };
+  this.valueOf = function() {
+    return this.order === FORWARD ? this.values : this.values.reverse();
   };
 };
 

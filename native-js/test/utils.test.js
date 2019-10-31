@@ -5,7 +5,8 @@ const {
   arrayFill,
   partition,
   combine,
-  modeConvert
+  modeConvert,
+  isEmpty
 } = utils;
 
 describe("Utils", function() {
@@ -156,6 +157,24 @@ describe("Utils", function() {
       const result = modeConvert(45);
 
       expect(result).to.eql({ nrow: 4, ncol: 5 });
+    });
+  });
+
+  describe("isEmpty", function() {
+    it("should return true when give empty string, object or array", function() {
+      expect(isEmpty("")).to.be.true;
+      expect(isEmpty([])).to.be.true;
+      expect(isEmpty({})).to.be.true;
+
+      expect(isEmpty("a")).to.be.false;
+      expect(isEmpty(["a"])).to.be.false;
+      expect(isEmpty({ name: "a" })).to.be.false;
+    });
+
+    it("should return true when give null, undefined or NaN", function() {
+      expect(isEmpty(null)).to.be.true;
+      expect(isEmpty(undefined)).to.be.true;
+      expect(isEmpty(NaN)).to.be.true;
     });
   });
 });

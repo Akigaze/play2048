@@ -148,7 +148,7 @@ const EventHandler = {
   keypress: event => {
     console.log("press key: ", commonConstants.EVENT_KEY[event.keyCode]);
     if (Object.values(commonConstants.EVENT_KEY).includes(event.keyCode)) {
-      const newValues = EventHandler.do(action.updateValue)(event.keyCode);
+      const newValues = EventHandler.do(selector.movedCellValues)(event.keyCode);
       if (newValues) {
         console.log("new values are: ", newValues);
         action.saveHistory();
@@ -290,7 +290,7 @@ const EventHandler = {
       if (classList.contains(SELECT_MODE)) {
         if (classList.contains("cell")) {
           const index = ElementGetter.gridCells().indexOf(this);
-          action.modifyCellValue(index, 0);
+          action.resetCellValue(index, 0);
           UIRefresher.grid(state.cellValues);
         } else {
           this.style.display = "none";

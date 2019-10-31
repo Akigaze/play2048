@@ -70,5 +70,17 @@ const utils = {
       }
     }
     return null;
+  },
+  isEmpty: value => {
+    if (![null, undefined, NaN, ""].includes(value)) {
+      if (Array.isArray(value)) {
+        return value.length === 0;
+      }
+      if (Object.getPrototypeOf(value) === Object.prototype) {
+        return Object.keys(value).length === 0;
+      }
+      return false;
+    }
+    return true;
   }
 };
