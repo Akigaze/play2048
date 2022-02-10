@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <title>2048</title>
-    <link rel="stylesheet" href="css/animation.css" />
-    <link rel="stylesheet" href="css/main.css" />
-    <script type="text/javascript" src="js/constants.js"></script>
-    <script type="text/javascript" src="js/utils.js"></script>
-    <script type="text/javascript" src="js/store.js"></script>
-    <script type="text/javascript" src="js/renderer.js"></script>
-    <script type="text/javascript" src="js/main.js"></script>
+    <link rel="stylesheet" href="./asset/css/animation.css" />
+    <link rel="stylesheet" href="./asset/css/main.css" />
+    <script type="text/javascript" src="./main/constants.js"></script>
+    <script type="text/javascript" src="./main/utils.js"></script>
+    <script type="text/javascript" src="./main/store.js"></script>
+    <script type="text/javascript" src="./main/renderer.js"></script>
+    <script type="text/javascript" src="./main/main.js"></script>
     <script type="text/javascript">
         window.onload = () => {
           process.initailCellValues();
@@ -38,10 +38,10 @@
       <ul id="menu" class="menu-list">
         <li class="hamburger-li">
           <div id="hamburger" class="hamburger-setting" onclick="EventHandler.openSetting(event)">
-            <img src="../images/hamburger.png" title="this is to open setting"/>
+            <img src="./asset/images/hamburger.png" title="this is to open setting"/>
           </div>
           <div id="setting-pannel" class="setting" style="display:none">
-            <p class="setting-title"><img src="../images/modem.png" /></p>
+            <p class="setting-title"><img src="./asset/images/modem.png" /></p>
             <ul class="mode-selection">
               <li>
                 <input id="mode33" type="radio" name="mode" value=33 checked/>
@@ -63,31 +63,31 @@
         </li>
         <li>
           <div class="reset-icon" onclick="EventHandler.reset()">
-            <img src="../images/cloud.png" title="back to last step" />
+            <img src="./asset/images/cloud.png" title="back to last step" />
             <span id="step" class="step-count">0</span>
           </div>
         </li>
         <li class="rocket-li">
           <div id="rocket" onclick="EventHandler.seeExplodeMode(event)">
-            <img src="../images/rocket.png" title="bomb bomb bomb"/>
+            <img src="./asset/images/rocket.png" title="bomb bomb bomb"/>
           </div>
           <div id="rocket-mode" class="rocket" style="display:none">
-              <img id="bomb" src="../images/bomb.png" title="random bomb" onclick="EventHandler.delete(event)"/>
-              <img id="rocket-fire" src="../images/rocket-fire.png" title="bomb the guy you hate" onclick="EventHandler.selectToDelete(event)"/>
+              <img id="bomb" src="./asset/images/bomb.png" title="random bomb" onclick="EventHandler.delete(event)"/>
+              <img id="rocket-fire" src="./asset/images/rocket-fire.png" title="bomb the guy you hate" onclick="EventHandler.selectToDelete(event)"/>
           </div>
         </li>
         <li>
           <div id="truck" onclick="EventHandler.switch()">
-            <img src="../images/truck.png" />
+            <img src="./asset/images/truck.png" />
           </div>
         </li>
         <li>
           <div id="cat" onclick="EventHandler.shuffle()">
-            <img src="../images/cat.png" />
+            <img src="./asset/images/cat.png" />
           </div>
         </li>
         <li>
-          <div><img src="../images/sailboat.png" /></div>
+          <div><img src="./asset/images/sailboat.png" /></div>
         </li>
       </ul>
     </div>
