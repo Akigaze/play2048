@@ -8,9 +8,9 @@ const store = new function Store() {
   };
 
   const initialConfig = {
-    mode: gameConstants.mode[33],
-    nrow: 3,
-    ncol: 3,
+    mode: gameConstants.mode[55],
+    nrow: 5,
+    ncol: 5,
     winPoint: 512
   };
 
@@ -81,6 +81,7 @@ const store = new function Store() {
       return nextValues;
     },
     movedCellValues: (values, order = commonConstants.ORDER.FORWARD) => {
+      console.log(values);
       return values.map(data =>
         new Row(data, order)
           .move()

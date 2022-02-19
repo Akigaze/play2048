@@ -12,9 +12,10 @@ export type Options = {
   ncol?: number;
 };
 
-export interface Component {
-  element: HTMLElement;
-  render(): void;
+export interface Component<T> {
+  element?: HTMLElement | null;
+  render(): HTMLElement | void;
+  rerender?(preValue: T): void;
 }
 
 export interface Setting {
@@ -24,4 +25,23 @@ export interface Setting {
 
 export interface Grid {}
 
+export interface cell {
+  readonly index: number;
+  value: number;
+}
+
+export interface Cell {
+  readonly id: string;
+  value: number;
+  getRow(): number;
+  getCol(): number;
+}
+
 export interface Score {}
+
+export enum Direction {
+  up = "ArrowUp",
+  down = "ArrowDown",
+  left = "ArrowLeft",
+  right = "ArrowRight",
+}

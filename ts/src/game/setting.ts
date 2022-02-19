@@ -1,6 +1,6 @@
 import { Component, Grid, Options, Score, Setting as SettingI } from "./types";
 
-export default class Setting implements Component, SettingI {
+export default class Setting implements Component<any>, SettingI {
   element: HTMLElement;
   grid: Grid;
   score: Score;
