@@ -13,7 +13,7 @@ export default class Game2048 implements Game {
   setting(selector: Selector, options?: Options): Game {
     this._setting = new Setting(
       this._findElement(selector),
-      options || this.getDefaultOptions()
+      this.mergeOptions(options)
     );
     return this;
   }
@@ -28,8 +28,16 @@ export default class Game2048 implements Game {
     return this;
   }
 
-  getDefaultOptions() {
-    return { row: 4, col: 4 };
+  getDefaultOptions(): Options {
+    return { nrow: 4, ncol: 4 };
+  }
+
+  mergeOptions(options: Options): Options {
+    let defaultOpts = this.getDefaultOptions();
+    if (options) {
+      return { ...defaultOpts, ...options };
+    }
+    return defaultOpts;
   }
 
   private _findElement(selector: Selector): HTMLElement {

@@ -8,8 +8,8 @@ export interface Game {
 export type Selector = string;
 
 export type Options = {
-  row?: number;
-  col?: number;
+  nrow?: number;
+  ncol?: number;
 };
 
 export interface Component {
@@ -18,8 +18,8 @@ export interface Component {
 }
 
 export interface Setting {
-  getRow(): number;
-  getCol(): number;
+  getNrow(): number;
+  getNcol(): number;
 }
 
 export interface Grid {}

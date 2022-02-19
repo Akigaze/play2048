@@ -11,12 +11,12 @@ export default class Setting implements Component, SettingI {
     this.options = options;
   }
 
-  getRow(): number {
-    return this.options.row;
+  getNrow(): number {
+    return this.options.nrow;
   }
 
-  getCol(): number {
-    return this.options.col;
+  getNcol(): number {
+    return this.options.ncol;
   }
 
   setup(grid: Grid, score: Score): void {
