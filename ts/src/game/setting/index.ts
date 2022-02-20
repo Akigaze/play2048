@@ -5,7 +5,7 @@ import {
   Score,
   Setting as SettingI,
   Store,
-} from "./types";
+} from "../types";
 
 export default class Setting implements Component<any>, SettingI {
   options: Options;

@@ -1,5 +1,5 @@
-import * as stl from "./style";
-import { Component, Score as ScoreI, ScoreProps, State, Store } from "./types";
+import * as stl from "../style";
+import { Component, Score as ScoreI, ScoreProps, State, Store } from "../types";
 
 export default class Score implements Component<{ score: number }>, ScoreI {
   readonly scoreId: string;
