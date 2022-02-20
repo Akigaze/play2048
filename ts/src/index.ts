@@ -7,5 +7,5 @@ window.onload = () => {
     .setting(".setting")
     .score(".score")
     .grid(".grid")
-    .start({ nrow: 3, ncol: 5 });
+    .start({ nrow: 3, ncol: 2 });
 };

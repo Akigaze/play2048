@@ -71,7 +71,7 @@ export type scores = {
 
 export type Action = {
   type: string;
-  payload: any;
+  payload?: any;
 };
 
 export type State = {

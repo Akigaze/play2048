@@ -6,6 +6,7 @@ export const CELL_SIZE: number = 80;
 export const CELL_FONT_SIZE: number = 40;
 export const CELL_MARGIN: number = 8;
 export const SMALL_COLOR: string = "#ddd1c5";
+export const BTN_SIZE: number = 60;
 
 export type CellStyle = {
   background: string;

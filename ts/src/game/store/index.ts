@@ -1,6 +1,7 @@
 import { score } from "../grid/algorithm";
-import { Action, State, Store as StoreI } from "../types";
-import { UPDATE_CELLS, UPDATE_SCORE } from "./action";
+import { Action, cell, scores, State, Store as StoreI } from "../types";
+import { generateRandomCells } from "../utils";
+import { RENEW, UPDATE_CELLS, UPDATE_SCORE } from "./action";
 
 export default class Store implements StoreI {
   state: State;
@@ -42,6 +43,16 @@ export default class Store implements StoreI {
         let score: number = this.state.scores.score + plus;
         let highScore: number = score > high ? score : high;
         return { ...this.state, scores: { score, highScore } };
+      }
+      case RENEW: {
+        let newCells: cell[] = this.state.cells.map(
+          (c) => ({ index: c.index, value: 0 } as cell)
+        );
+        generateRandomCells(newCells.length, 2).forEach((c) => {
+          newCells[c.index].value = c.value;
+        });
+        let newScores: scores = { ...this.state.scores, score: 0 };
+        return { ...this.state, scores: newScores, cells: newCells };
       }
     }
     return this.state;
