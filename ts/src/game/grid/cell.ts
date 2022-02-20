@@ -1,23 +1,17 @@
-import { Component, Cell as CellI, cell } from "../types";
+import { Component, Cell as CellI, cell, CellProps, Store } from "../types";
 import * as stl from "../style";
 
-export type CellProps = {
-  index: number;
-  row: number;
-  col: number;
-};
-
 export default class Cell implements Component<number>, CellI {
-  private row: number;
-  private col: number;
-
+  readonly row: number;
+  readonly col: number;
   readonly index: number;
   readonly id: string;
   value: number = 0;
-  constructor({ index, row, col }: CellProps) {
+  constructor({ index, row, col, value }: CellProps) {
     this.index = index;
     this.row = row;
     this.col = col;
+    this.value = value;
 
     this.id = Cell.getId(index);
   }
@@ -40,7 +34,17 @@ export default class Cell implements Component<number>, CellI {
 
   randomCell(): cell {
     const random = Math.random();
-    return { value: random > 0.5 ? 4 : 2, index: this.index };
+    return { value: random > 0.75 ? 4 : 2, index: this.index };
+  }
+
+  connect({ subscribe }: Store): void {
+    subscribe((state) => {
+      let newValue: number = state.cells[this.index].value;
+      if (newValue !== this.value) {
+        this.value = newValue;
+        this.rerender(this.value);
+      }
+    });
   }
 
   render(): HTMLElement {
@@ -72,15 +76,12 @@ export default class Cell implements Component<number>, CellI {
   }
 
   rerender(newValue: number): void {
-    if (newValue !== this.value) {
-      this.value = newValue;
-      const cellStyle: stl.CellStyle = stl.CELL_STYLES[this.value];
-      const cell: HTMLDivElement = document.querySelector(`#${this.id}`);
-      cell.style.background = cellStyle.background;
-      const value: HTMLSpanElement = cell.querySelector("span");
-      value.style.color = cellStyle.color;
-      value.innerText = `${this.value || ""}`;
-      return;
-    }
+    const cellStyle: stl.CellStyle = stl.CELL_STYLES[this.value];
+    const cell: HTMLDivElement = document.querySelector(`#${this.id}`);
+    cell.style.background = cellStyle.background;
+    const value: HTMLSpanElement = cell.querySelector("span");
+    value.style.color = cellStyle.color;
+    value.innerText = `${this.value || ""}`;
+    return;
   }
 }

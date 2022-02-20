@@ -1,8 +1,11 @@
 export const BROWN: string = "#bbada0";
-export const RICE_WHITE: string = "#d6cdc6";
+export const LIGHT_BROWN: string = "#d6cdc6";
+export const RICE_WHITE: string = "#fcf7e9";
+export const DARK_BROWN: string = "#766f67";
 export const CELL_SIZE: number = 80;
 export const CELL_FONT_SIZE: number = 40;
 export const CELL_MARGIN: number = 8;
+export const SMALL_COLOR: string = "#ddd1c5";
 
 export type CellStyle = {
   background: string;
@@ -14,7 +17,7 @@ export interface CellStyles {
 }
 
 export const CELL_STYLES: CellStyles = {
-  0: { background: RICE_WHITE, color: RICE_WHITE },
+  0: { background: LIGHT_BROWN, color: LIGHT_BROWN },
   2: { background: "#ede5da", color: "#837a70" },
   4: { background: "#ece0c8", color: "#796b60" },
   8: { background: "#f0b17b", color: "#f7f0e4" },

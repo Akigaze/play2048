@@ -11,4 +11,5 @@ body {
   justify-content: center;
   align-items: center;
   flex-flow: column wrap;
+  font-family: sans-serif;
 }

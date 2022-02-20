@@ -1,23 +1,31 @@
 import {
   Component,
-  Score,
-  Setting,
   Grid as GridI,
   Direction,
   cell,
+  Store,
+  GridProps,
+  Action,
 } from "../types";
 import Cell from "./cell";
 import * as stl from "../style";
-import { shift } from "./algorithm";
+import * as al from "./algorithm";
+import { UPDATE_CELLS, UPDATE_SCORE } from "../store/action";
+import { generateRandomCells } from "../utils";
 
 export default class Grid implements Component<cell[]>, GridI {
-  setting: Setting;
-  score: Score;
-
   private cells: Cell[];
+  private nrow: number;
+  private ncol: number;
   readonly id: string;
-  constructor() {
+
+  dispatch: (action: Action) => void;
+
+  constructor({ nrow, ncol, cells }: GridProps) {
     this.id = `g2048-grid`;
+    this.nrow = nrow;
+    this.ncol = ncol;
+    this.cells = this.createCells(cells, nrow, ncol);
   }
 
   static generateRandomValue(cells: Cell[], times: number = 2): cell[] {
@@ -33,16 +41,22 @@ export default class Grid implements Component<cell[]>, GridI {
     return document.querySelector(`#${this.id}`);
   }
 
-  private createCells(): Cell[] {
-    const cells: Cell[] = [];
+  private createCells(cells: cell[], nrow: number, ncol: number): Cell[] {
+    const cs: Cell[] = [];
     let i: number = 0;
-    for (let nr = 0; nr < this.setting.getNrow(); nr++) {
-      for (let nc = 0; nc < this.setting.getNcol(); nc++) {
-        let cell: Cell = new Cell({ index: i++, row: nr, col: nc });
-        cells.push(cell);
+    for (let nr = 0; nr < nrow; nr++) {
+      for (let nc = 0; nc < ncol; nc++) {
+        let c: Cell = new Cell({
+          index: i,
+          row: nr,
+          col: nc,
+          value: cells[i].value,
+        });
+        cs.push(c);
+        i++;
       }
     }
-    return cells;
+    return cs;
   }
 
   groupCells(
@@ -62,14 +76,15 @@ export default class Grid implements Component<cell[]>, GridI {
     let newValues: cell[] = [];
     for (const group of cellGroup) {
       let values: cell[] = group.map((c) => c.simplify());
-      shift(values.map((c) => c.value)).forEach(
+      al.shift(values.map((c) => c.value)).forEach(
         (v, i) => (values[i].value = v)
       );
       newValues = [...newValues, ...values];
       console.log(values);
     }
     newValues = newValues.sort((x, y) => x.index - y.index);
-    this.findElement().dispatchEvent(new RerenderEvent(newValues));
+
+    this.checkAndDispatchChange(newValues);
   }
 
   moveUp(): void {
@@ -121,17 +136,11 @@ export default class Grid implements Component<cell[]>, GridI {
           break;
       }
     });
-
-    el.addEventListener("rerender", (e: Event) => {
-      const newCells: cell[] = (e as RerenderEvent).cells;
-      this.rerender(newCells);
-    });
   }
 
-  setup(setting: Setting, score: Score): void {
-    this.setting = setting;
-    this.score = score;
-    this.cells = this.createCells();
+  connect(store: Store): void {
+    this.cells.forEach((c) => c.connect(store));
+    this.dispatch = store.dispatch;
   }
 
   render(): HTMLElement {
@@ -141,17 +150,11 @@ export default class Grid implements Component<cell[]>, GridI {
     el.style.borderRadius = "16px";
     el.style.display = "flex";
     el.style.flexFlow = "row wrap";
-    el.style.fontFamily = "sans-serif";
 
     el.style.padding = `${stl.CELL_MARGIN}px`;
     el.style.background = stl.BROWN;
-    el.style.width = `${
-      (stl.CELL_SIZE + 2 * stl.CELL_MARGIN) * this.setting.getNcol()
-    }px`;
-
-    Grid.generateRandomValue(this.cells, 2).forEach(
-      (c) => (this.cells[c.index].value = c.value)
-    );
+    const width = (stl.CELL_SIZE + 2 * stl.CELL_MARGIN) * this.ncol;
+    el.style.width = `${width}px`;
 
     for (const cell of this.cells) {
       el.appendChild(cell.render());
@@ -161,36 +164,37 @@ export default class Grid implements Component<cell[]>, GridI {
     return el;
   }
 
-  rerender(newValue: cell[]): void {
-    new Promise<void>((resolve, reject) => {
-      const changed: boolean = newValue.some(
-        (c: cell, i: number) => c.value !== this.cells[i].value
+  checkAndDispatchChange(cells: cell[]): void {
+    new Promise<number>((resolve, reject) => {
+      let changed: boolean = cells.some(
+        (c, i) => c.value !== this.cells[i].value
       );
-      console.log("---- change: ", changed);
+      console.log("changed: ", changed);
 
-      this.cells.forEach((cell: Cell, i: number) => {
-        cell.rerender(newValue[i].value);
-      });
-
-      if (changed) {
-        resolve();
+      if (!changed) {
+        return;
       }
-    })
-      .then((): void => {
-        const zeroCells: Cell[] = this.cells.filter((c) => c.value === 0);
-        Grid.generateRandomValue(zeroCells, 1).forEach((c) =>
-          this.cells[c.index].rerender(c.value)
+
+      let scorePlus: number = al.score(
+        this.cells.map((c) => c.value),
+        cells.map((c) => c.value)
+      );
+      console.log("plus score: ", scorePlus);
+
+      const zeroCells: cell[] = cells.filter((c) => c.value === 0);
+      if (zeroCells.length > 0) {
+        generateRandomCells(zeroCells.length, 1).forEach(
+          (c) => (zeroCells[c.index].value = c.value)
         );
+      }
+      this.dispatch({ type: UPDATE_CELLS, payload: cells });
+      resolve(scorePlus);
+    })
+      .then((scorePlus: number): void => {
+        if (scorePlus > 0) {
+          this.dispatch({ type: UPDATE_SCORE, payload: scorePlus });
+        }
       })
       .catch();
-  }
-}
-
-class RerenderEvent extends Event {
-  cells: cell[];
-
-  constructor(cells: cell[]) {
-    super("rerender");
-    this.cells = cells;
   }
 }

@@ -1,3 +1,5 @@
+import { groupBy } from "../utils";
+
 export function shift(values: number[]): number[] {
   if (values.length === 0) {
     return values;
@@ -24,5 +26,23 @@ export function shift(values: number[]): number[] {
 }
 
 export function score(preValues: number[], curValues: number[]): number {
-  return 0;
+  let preGroup: Record<number, number[]> = groupBy(preValues, (v) => v);
+  let curGroup: Record<number, number[]> = groupBy(curValues, (v) => v);
+
+  let scores: number[] = [];
+  for (let key in preGroup) {
+    if (key) {
+      console;
+    }
+    let curs: number[] = curGroup[key];
+    let pres: number[] = preGroup[key];
+    let scoreItems: number[] = pres.filter((v) => !curs?.pop());
+    let double: number = scoreItems[0] * 2;
+    for (let i = 0; i < scoreItems.length / 2; i++) {
+      curGroup[double]?.pop();
+    }
+    scores = scores.concat(scoreItems);
+  }
+
+  return scores.reduce((pre, cur) => pre + cur);
 }
