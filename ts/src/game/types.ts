@@ -78,6 +78,8 @@ export type State = {
   options: Options;
   cells: cell[];
   scores: scores;
+  history: {cells: cell[][], scores: scores[]}
+  stepCount: number
 };
 
 export interface Store {

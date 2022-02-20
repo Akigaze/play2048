@@ -30,6 +30,7 @@ export default class Score implements Component<{ score: number }>, ScoreI {
     text.style.display = "inline-block";
     text.style.fontSize = "100px";
     text.style.fontWeight = "bolder";
+    text.style.userSelect = "none";
     text.style.color = stl.DARK_BROWN;
 
     el.appendChild(text);
@@ -54,6 +55,7 @@ export default class Score implements Component<{ score: number }>, ScoreI {
     textEl.style.display = "inline-block";
     textEl.style.fontSize = "12px";
     textEl.style.fontWeight = "bolder";
+    textEl.style.userSelect = "none";
     textEl.style.color = stl.SMALL_COLOR;
 
     const valueEl: HTMLSpanElement = document.createElement("span");

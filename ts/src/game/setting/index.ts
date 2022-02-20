@@ -8,7 +8,7 @@ import {
   Store,
 } from "../types";
 import * as stl from "../style";
-import { RENEW } from "../store/action";
+import { RENEW, REVERT } from "../store/action";
 
 export default class Setting implements Component<any>, SettingI {
   options: Options;
@@ -61,7 +61,9 @@ export default class Setting implements Component<any>, SettingI {
 
   createRevertButton(): HTMLElement {
     let el: HTMLDivElement = this.buttonTemplate("🙁", "revert");
-
+    el.addEventListener("click", () => {
+      this.dispatch({type: REVERT,})
+    })
     return el;
   }
 

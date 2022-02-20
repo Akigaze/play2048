@@ -83,10 +83,13 @@ export default class Game2048 implements Game {
   }
 
   initStore(opts: Options) {
+    const initCells = this.initCells(opts.nrow, opts.ncol);
     let initState: State = {
       options: opts,
       scores: { score: 0, highScore: 0 },
-      cells: this.initCells(opts.nrow, opts.ncol),
+      cells: initCells,
+      history: { cells: [], scores: [] },
+      stepCount: 0,
     };
     console.log("init state: ", initState);
 
