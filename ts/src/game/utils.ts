@@ -1,4 +1,4 @@
-import { cell } from "./types";
+import { cell, Selector } from "./types";
 
 export const groupBy = <T, K extends keyof any>(
   items: T[],
@@ -27,4 +27,12 @@ export const generateRandomCells = (
 const randomCell = (index: number): cell => {
   const random = Math.random();
   return { value: random > 0.75 ? 4 : 2, index: index };
+};
+
+export const findElement = (selector: Selector): HTMLElement => {
+  const element: HTMLElement = document.querySelector(selector);
+  if (element === null) {
+    throw new Error("selector not exist: " + selector);
+  }
+  return element;
 };

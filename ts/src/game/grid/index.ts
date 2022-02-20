@@ -11,7 +11,7 @@ import Cell from "./cell";
 import * as stl from "../style";
 import * as al from "./algorithm";
 import { UPDATE_CELLS, UPDATE_SCORE } from "../store/action";
-import { generateRandomCells } from "../utils";
+import { generateRandomCells, groupBy } from "../utils";
 
 export default class Grid implements Component<cell[]>, GridI {
   private cells: Cell[];
@@ -26,19 +26,6 @@ export default class Grid implements Component<cell[]>, GridI {
     this.nrow = nrow;
     this.ncol = ncol;
     this.cells = this.createCells(cells, nrow, ncol);
-  }
-
-  static generateRandomValue(cells: Cell[], times: number = 2): cell[] {
-    let generated: cell[] = [];
-    for (let i = 0; i < times; i++) {
-      let random = Math.random();
-      let i = Math.floor(random * cells.length);
-      generated.push(cells[i].randomCell());
-    }
-    return generated;
-  }
-  private findElement(): HTMLElement {
-    return document.querySelector(`#${this.id}`);
   }
 
   private createCells(cells: cell[], nrow: number, ncol: number): Cell[] {
@@ -63,13 +50,10 @@ export default class Grid implements Component<cell[]>, GridI {
     groupKey: (c: Cell) => number,
     sortKey: (c: Cell) => number
   ): Cell[][] {
-    return Object.values(
-      this.cells.reduce<{ [g: number]: Cell[] }>((pre, cur) => {
-        let g: number = groupKey(cur);
-        (pre[g] || (pre[g] = [])).push(cur);
-        return pre;
-      }, {})
-    ).map((cs) => cs.sort((x, y) => sortKey(x) - sortKey(y)));
+    groupBy(this.cells, groupKey);
+    return Object.values(groupBy(this.cells, groupKey)).map((cs) =>
+      cs.sort((x, y) => sortKey(x) - sortKey(y))
+    );
   }
 
   private move(cellGroup: Cell[][]): void {
@@ -119,7 +103,7 @@ export default class Grid implements Component<cell[]>, GridI {
     this.move(cellGroup);
   }
 
-  addEventHandlers(el: HTMLElement): void {
+  addEventHandlers(): void {
     window.addEventListener("keydown", (e: KeyboardEvent) => {
       switch (e.key) {
         case Direction.up:
@@ -154,13 +138,14 @@ export default class Grid implements Component<cell[]>, GridI {
     el.style.padding = `${stl.CELL_MARGIN}px`;
     el.style.background = stl.BROWN;
     const width = (stl.CELL_SIZE + 2 * stl.CELL_MARGIN) * this.ncol;
+
     el.style.width = `${width}px`;
 
     for (const cell of this.cells) {
       el.appendChild(cell.render());
     }
 
-    this.addEventHandlers(el);
+    this.addEventHandlers();
     return el;
   }
 

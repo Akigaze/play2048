@@ -1,11 +1,9 @@
-import Game2048 from "./game";
-
-console.log("hello 2048");
+import Game2048Builder from "./game";
+import { Game } from "./game/types";
 
 window.onload = () => {
-  new Game2048()
-    .setting(".setting")
-    .score(".score")
-    .grid(".grid")
-    .start({ nrow: 3, ncol: 3  });
+  const game: Game = new Game2048Builder().build({ nrow: 3, ncol: 2 });
+  game.startSetting(".setting");
+  game.startScore(".score");
+  game.startGrid(".grid");
 };

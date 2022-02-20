@@ -1,8 +1,11 @@
 export interface Game {
-  setting(selector: Selector): Game;
-  score(selector: Selector): Game;
-  grid(selector: Selector): Game;
-  start(options?: Options): void;
+  startSetting(selector: Selector): Setting;
+  startGrid(selector: Selector): Grid;
+  startScore(selector: Selector): Score;
+}
+
+export interface GameBuilder {
+  build(options?: Options): Game;
 }
 
 export type Selector = string;
