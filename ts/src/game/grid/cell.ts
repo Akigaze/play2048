@@ -43,7 +43,7 @@ export default class Cell implements Component<number>, CellI {
     return { value: random > 0.5 ? 4 : 2, index: this.index };
   }
 
-  render(): HTMLElement | void {
+  render(): HTMLElement {
     const cellStyle: stl.CellStyle = stl.CELL_STYLES[this.value];
 
     let cell: HTMLDivElement = document.createElement("div");

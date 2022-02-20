@@ -4,27 +4,34 @@ import Setting from "./setting";
 import { Game, Options, Selector } from "./types";
 
 export default class Game2048 implements Game {
-  private _grid: Grid;
   private _setting: Setting;
+  private _grid: Grid;
   private _score: Score;
+
+  settingContaienr: HTMLElement
+  gridContaienr: HTMLElement
+  scoreContaienr: HTMLElement
 
   constructor() {}
 
   setting(selector: Selector, options?: Options): Game {
-    this._setting = new Setting(
-      this._findElement(selector),
-      this.mergeOptions(options)
-    );
+      
+    this.settingContaienr = this._findElement(selector)
+    this._setting = new Setting(this.mergeOptions(options));
+    return this;
+  }
+
+
+  
+  grid(selector: Selector): Game {
+    this.gridContaienr = this._findElement(selector)
+    this._grid = new Grid();
     return this;
   }
 
   score(selector: Selector): Game {
-    this._score = new Score(this._findElement(selector));
-    return this;
-  }
-
-  grid(selector: Selector): Game {
-    this._grid = new Grid(this._findElement(selector));
+    this.scoreContaienr = this._findElement(selector)
+    this._score = new Score();
     return this;
   }
 
@@ -52,8 +59,8 @@ export default class Game2048 implements Game {
     this._grid.setup(this._setting, this._score);
     this._setting.setup(this._grid, this._score);
 
-    this._setting.render();
-    this._score.render();
-    this._grid.render();
+    this.settingContaienr.appendChild(this._setting.render());
+    this.gridContaienr.appendChild(this._grid.render());
+    this.scoreContaienr.appendChild(this._score.render());
   }
 }

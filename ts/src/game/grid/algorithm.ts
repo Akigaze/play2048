@@ -22,3 +22,7 @@ export function shift(values: number[]): number[] {
   }
   return values;
 }
+
+export function score(preValues: number[], curValues: number[]): number {
+  return 0;
+}

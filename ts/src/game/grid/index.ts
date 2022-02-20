@@ -11,13 +11,13 @@ import * as stl from "../style";
 import { shift } from "./algorithm";
 
 export default class Grid implements Component<cell[]>, GridI {
-  element: HTMLElement;
   setting: Setting;
   score: Score;
 
   private cells: Cell[];
-  constructor(element: HTMLElement) {
-    this.element = element;
+  readonly id: string;
+  constructor() {
+    this.id = `g2048-grid`;
   }
 
   static generateRandomValue(cells: Cell[], times: number = 2): cell[] {
@@ -29,11 +29,8 @@ export default class Grid implements Component<cell[]>, GridI {
     }
     return generated;
   }
-
-  private findDifferentCells(newCells: Cell[]): Cell[] {
-    return this.cells.filter((cell: Cell, i: number) => {
-      return cell.value !== newCells[i].value;
-    });
+  private findElement(): HTMLElement {
+    return document.querySelector(`#${this.id}`);
   }
 
   private createCells(): Cell[] {
@@ -72,7 +69,7 @@ export default class Grid implements Component<cell[]>, GridI {
       console.log(values);
     }
     newValues = newValues.sort((x, y) => x.index - y.index);
-    this.element.dispatchEvent(new RerenderEvent(newValues));
+    this.findElement().dispatchEvent(new RerenderEvent(newValues));
   }
 
   moveUp(): void {
@@ -107,7 +104,7 @@ export default class Grid implements Component<cell[]>, GridI {
     this.move(cellGroup);
   }
 
-  addKeyboardEventHandler(): void {
+  addEventHandlers(el: HTMLElement): void {
     window.addEventListener("keydown", (e: KeyboardEvent) => {
       switch (e.key) {
         case Direction.up:
@@ -124,6 +121,11 @@ export default class Grid implements Component<cell[]>, GridI {
           break;
       }
     });
+
+    el.addEventListener("rerender", (e: Event) => {
+      const newCells: cell[] = (e as RerenderEvent).cells;
+      this.rerender(newCells);
+    });
   }
 
   setup(setting: Setting, score: Score): void {
@@ -132,8 +134,9 @@ export default class Grid implements Component<cell[]>, GridI {
     this.cells = this.createCells();
   }
 
-  render(): void {
-    const el = this.element;
+  render(): HTMLElement {
+    const el: HTMLDivElement = document.createElement("div");
+    el.id = "g2048-grid";
 
     el.style.borderRadius = "16px";
     el.style.display = "flex";
@@ -151,17 +154,11 @@ export default class Grid implements Component<cell[]>, GridI {
     );
 
     for (const cell of this.cells) {
-      el.appendChild(cell.render() as HTMLElement);
+      el.appendChild(cell.render());
     }
 
-    el.addEventListener("rerender", (e: Event) => {
-      console.log(e.type);
-
-      const newCells: cell[] = (e as RerenderEvent).cells;
-      this.rerender(newCells);
-    });
-
-    this.addKeyboardEventHandler();
+    this.addEventHandlers(el);
+    return el;
   }
 
   rerender(newValue: cell[]): void {

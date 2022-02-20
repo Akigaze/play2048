@@ -1,13 +1,11 @@
 import { Component, Grid, Options, Score, Setting as SettingI } from "./types";
 
 export default class Setting implements Component<any>, SettingI {
-  element: HTMLElement;
   grid: Grid;
   score: Score;
 
   options: Options;
-  constructor(element: HTMLElement, options: Options) {
-    this.element = element;
+  constructor(options: Options) {
     this.options = options;
   }
 
@@ -24,7 +22,11 @@ export default class Setting implements Component<any>, SettingI {
     this.score = score;
   }
 
-  render(): void {
-    this.element.innerText = "setting";
+  render(): HTMLElement {
+    const el: HTMLSpanElement = document.createElement("span");
+    el.id = "g2048-setting"
+
+    el.innerText = "setting";
+    return el;
   }
 }

@@ -13,9 +13,8 @@ export type Options = {
 };
 
 export interface Component<T> {
-  element?: HTMLElement | null;
-  render(): HTMLElement | void;
-  rerender?(preValue: T): void;
+  render(): HTMLElement;
+  rerender?(newProps: T): void;
 }
 
 export interface Setting {
